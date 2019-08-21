@@ -1,45 +1,61 @@
 import scrapy
+from scrapy.crawler import CrawlerProcess
 import requests
 import unittest
 
-url = 'http://172.18.58.238/spicyx/'
-url2 = 'http://172.18.58.238/headers.php'
+#url = 'http://172.18.58.238/spicyx/'
+#url2 = 'http://172.18.58.238/headers.php'
+url = 'https://pixabay.com/'
+url2 = 'https://en.wikipedia.org/wiki/headers.php'
 
 
 class NewSpider(scrapy.Spider):
-            name = "new_spider"
-            start_urls = ['http://172.18.58.238/spicyx/']
-            def parse(self, response):
-                            css_selector = 'img'
-                            for x in response.css(css_selector):
-                                    newsel = '@src'
-                                    yield {'Image_Link': x.xpath(newsel).extract_first()}
+    name = "new_spider"
+    #start_urls = ['http://172.18.58.238/spicyx/']
+    start_urls = ['https://pixabay.com/']
+
+    def parse(self, response):
+        css_selector = 'img'
+        for x in response.css(css_selector):
+            newsel = '@src'
+            yield {'Image_Link': x.xpath(newsel).extract_first()}
+
+process = CrawlerProcess({
+    'FEED_URI': 'results.json',
+})
+
+process.crawl(NewSpider)
+process.start()
+
 print("*********************************************************************************************")
 r = requests.get(url)
 print("Status Code:")
-print("\t*",r.status_code)
+print("\t*", r.status_code)
 h = requests.head(url)
 print("Header")
 print("*********************************************************************************************")
 for x in h.headers:
-    print("\t",x, ":", h.headers[x])
+    print("\t", x, ":", h.headers[x])
 print("*********************************************************************************************")
 
-headers = {'User-Agent':'Mobile'}
+headers = {'User-Agent': 'Mobile'}
 rh = requests.get(url2, headers=headers)
 print(rh.text)
 
 print("*********************************************************************************************")
+
+
 class test(unittest.TestCase):
 
     def test_user_agent(self):
-        self.assertEqual({'User-Agent':'Mobile'}, headers)
+        self.assertEqual({'User-Agent': 'Mobile'}, headers)
 
     def test_status_code(self):
         self.assertEqual(r.status_code, 200)
 
     def test_header(self):
-        self.assertTrue(h.headers !=())
+        self.assertTrue(h.headers != ())
 
-if __name__ =='__main__':
+
+if __name__ == '__main__':
     unittest.main()
