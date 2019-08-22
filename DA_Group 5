@@ -2,17 +2,16 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 import requests
 import unittest
+import webbrowser
 
-#url = 'http://172.18.58.238/spicyx/'
-#url2 = 'http://172.18.58.238/headers.php'
-url = 'https://pixabay.com/'
-url2 = 'https://en.wikipedia.org/wiki/headers.php'
+url = 'http://172.18.58.238/spicyx/'
+url2 = 'http://172.18.58.238/headers.php'
 
 
 class NewSpider(scrapy.Spider):
     name = "new_spider"
-    #start_urls = ['http://172.18.58.238/spicyx/']
-    start_urls = ['https://pixabay.com/']
+    start_urls = ['http://172.18.58.238/spicyx/']
+
 
     def parse(self, response):
         css_selector = 'img'
@@ -20,12 +19,10 @@ class NewSpider(scrapy.Spider):
             newsel = '@src'
             yield {'Image_Link': x.xpath(newsel).extract_first()}
 
-process = CrawlerProcess({
-    'FEED_URI': 'results.json',
-})
-
+process = CrawlerProcess({'FEED_URI': 'results.json',})
 process.crawl(NewSpider)
 process.start()
+webbrowser.open(url)
 
 print("*********************************************************************************************")
 r = requests.get(url)
